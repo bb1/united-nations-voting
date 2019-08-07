@@ -1,6 +1,7 @@
 const { Pool } = require('pg')
 const Resolver = require('./resolution-resolver')
 
+
 ;(async () => {
     // db init
     const pool = await Pool({

@@ -1,6 +1,7 @@
 const cheerio = require('cheerio')
 const rq = require('request-promise-native')
 
+
 class ResolutionResolver {
     constructor(pool, url) {
         this.pool = pool
@@ -10,8 +11,7 @@ class ResolutionResolver {
     async start() {
         const data = await this.grabData(this.url)
         const client = await this.pool.connect()
-        // await this.saveData(client, data)
-        console.info(JSON.stringify(data))
+        await this.saveData(client, data)
         await client.release()
         console.info(`done with ${this.url}`)
     }
@@ -44,9 +44,8 @@ class ResolutionResolver {
                     obj.date = $next.text()
                     break;
                 case 'Vote':
-                    const votes = $next.html().split('<br>')
+                    const votes = $next.html().split('<br>').map(vote => vote.trim())
                     obj.votes = votes
-                    console.log(votes.length)
                     break;
                 default:
                     // console.log(`nothing for: ${field}`)
@@ -57,17 +56,35 @@ class ResolutionResolver {
     }
 
     async saveData(client, data) {
-        const { rows } = await client.query(
-            `INSERT INTO un.agenda (title)
-            VALUES ($1) RETURING agenda_id`,
+        const res1 = await client.query(
+            `INSERT INTO un.agenda(title)
+            VALUES($1) RETURNING id`,
             [data.agenda])
-        console.info(rows)
-        const agenda_id = rows.agenda_id;
-        const { row2 } = await client.query(
+        const agenda_id = res1.rows.id;
+        const res2 = await client.query(
             `INSERT INTO un.resolution (title, agenda_id, resolution_name, vote_date)
-            VALUES ($1, $2, $3, $4) `,
+            VALUES ($1, $2, $3, $4) RETURNING id `,
             [data.title, agenda_id, data.id, data.date])
-        console.info(row2)
+        const resolution_id = res2.rows.id
+        console.log('NEW RESOLUTION: ' + resolution_id)
+        const affectedRowsArr = await Promise.all(data.votes.map(vote => this.insertVote(client, resolution_id, vote)))
+        console.info('inserted votes: ' + affectedRowsArr.reduce((prev, cur) => prev + cur))
+    }
+
+    async insertVote(client, id, voteStr) {
+        if (!voteStr || voteStr.length < 3 || voteStr.charAt(1) !== ' ') {
+            return 0
+        }
+        const vote = voteStr.split(' ')[0]
+        const country = voteStr.substr(2)
+        const absent = vote === 'A'
+        const approval = vote === 'Y'
+        const disaproval = vote === 'N'
+        const res = await client.query(
+            `INSERT INTO un.vote (resolution_id, country, yes, no, absent)
+            VALUES ($1, $2, $3, $4, $5) `,
+            [id, country, approval, disaproval, absent])
+        return res.affectedRows;
     }
 }
 
