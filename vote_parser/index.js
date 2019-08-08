@@ -17,6 +17,7 @@ const Resolver = require('./resolution-resolver')
         process.exit(-1)
     })
 
+    // TODO: get more urls
     const urls = ['https://digitallibrary.un.org/record/3814149?ln=en']
     const promises = urls.map(url => {
         const res = new Resolver(pool, url)
@@ -26,6 +27,6 @@ const Resolver = require('./resolution-resolver')
     await Promise.all(promises)
 
     await pool.end();
-    console.info('all done')
+    console.info('QUIT: all resolutions parsed')
     process.exit(0)
 })().catch(e => console.error(e))

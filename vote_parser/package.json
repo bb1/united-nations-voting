@@ -2,7 +2,7 @@
   "name": "un_vote_parser",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "birk.brauer@gmail.com",
+  "author": "birk brauer",
   "license": "MIT",
   "private": true,
   "scripts": {

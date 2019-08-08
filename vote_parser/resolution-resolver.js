@@ -41,10 +41,10 @@ class ResolutionResolver {
             switch (field) {
                 case 'Agenda':
                     obj.agenda = $next.children().eq(0).text()
-                    break;
+                    break
                 case 'Vote date':
                     obj.date = $next.text()
-                    break;
+                    break
                 case 'Vote':
                     // get the html to split by br, create a fake-span just to parse html-special chars, get text 
                     const votes = $next
@@ -52,10 +52,10 @@ class ResolutionResolver {
                         .split('<br>')
                         .map(vote => $('<span>' + vote.trim() + '</span>').text())
                     obj.votes = votes
-                    break;
+                    break
                 default:
-                    // console.log(`nothing for: ${field}`)
-                    break;
+                    // console.warn(`no handler for field: ${field}`)
+                    break
             }
         })
         return obj
@@ -82,7 +82,7 @@ class ResolutionResolver {
             [data.title, agenda_id, data.id, data.date])
         const resolution_id = res2.rows[0].id
         if (!resolution_id) {
-            throw new Error('create resolution failed');
+            throw new Error('create resolution failed')
         }
         const affectedRowsArr = await Promise.all(data.votes.map(vote => this.insertVote(client, resolution_id, vote)))
         const affectedRows = affectedRowsArr.reduce((prev, cur) => prev + cur)
@@ -102,7 +102,7 @@ class ResolutionResolver {
             `INSERT INTO un.vote (resolution_id, country, yes, no, absent)
             VALUES ($1, $2, $3, $4, $5) `,
             [id, country, approval, disaproval, absent])
-        return res.rowCount;
+        return res.rowCount
     }
 }
 
