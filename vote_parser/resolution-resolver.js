@@ -44,7 +44,11 @@ class ResolutionResolver {
                     obj.date = $next.text()
                     break;
                 case 'Vote':
-                    const votes = $next.html().split('<br>').map(vote => vote.trim())
+                    // get the html to split by br, create a fake-span just to parse html-special chars, get text 
+                    const votes = $next
+                        .html()
+                        .split('<br>')
+                        .map(vote => $('<span>' + vote.trim() + '</span>').text())
                     obj.votes = votes
                     break;
                 default:
@@ -65,8 +69,10 @@ class ResolutionResolver {
             `INSERT INTO un.resolution (title, agenda_id, resolution_name, vote_date)
             VALUES ($1, $2, $3, $4) RETURNING id `,
             [data.title, agenda_id, data.id, data.date])
-        const resolution_id = res2.rows.id
-        console.log('NEW RESOLUTION: ' + resolution_id)
+        const resolution_id = res2.rows[0].id
+        if (!resolution_id) {
+            throw new Error('create resolution failed');
+        }
         const affectedRowsArr = await Promise.all(data.votes.map(vote => this.insertVote(client, resolution_id, vote)))
         console.info('inserted votes: ' + affectedRowsArr.reduce((prev, cur) => prev + cur))
     }
@@ -84,7 +90,7 @@ class ResolutionResolver {
             `INSERT INTO un.vote (resolution_id, country, yes, no, absent)
             VALUES ($1, $2, $3, $4, $5) `,
             [id, country, approval, disaproval, absent])
-        return res.affectedRows;
+        return res.rowCount;
     }
 }
 
