@@ -9,11 +9,13 @@ class ResolutionResolver {
     }
 
     async start() {
+        const start = Date.now()
         const data = await this.grabData(this.url)
         const client = await this.pool.connect()
         await this.saveData(client, data)
         await client.release()
-        console.info(`done with ${this.url}`)
+        const duration = Date.now() - start
+        console.info(`done with ${this.url} in ${duration}ms`)
     }
 
     async grabData(url) {
@@ -60,11 +62,20 @@ class ResolutionResolver {
     }
 
     async saveData(client, data) {
-        const res1 = await client.query(
-            `INSERT INTO un.agenda(title)
-            VALUES($1) RETURNING id`,
+        let agenda_id
+        const res0 = await client.query(
+            `SELECT id FROM un.agenda WHERE title = $1`,
             [data.agenda])
-        const agenda_id = res1.rows.id;
+        if (res0.rows.length > 0) {
+            agenda_id = res0.rows[0].id
+        } else {
+            const res1 = await client.query(
+                `INSERT INTO un.agenda(title)
+                VALUES($1) RETURNING id`,
+                [data.agenda])
+            agenda_id = res1.rows.id;
+            console.info(`ADDED agenda: ${data.agenda}`)
+        }
         const res2 = await client.query(
             `INSERT INTO un.resolution (title, agenda_id, resolution_name, vote_date)
             VALUES ($1, $2, $3, $4) RETURNING id `,
@@ -74,7 +85,8 @@ class ResolutionResolver {
             throw new Error('create resolution failed');
         }
         const affectedRowsArr = await Promise.all(data.votes.map(vote => this.insertVote(client, resolution_id, vote)))
-        console.info('inserted votes: ' + affectedRowsArr.reduce((prev, cur) => prev + cur))
+        const affectedRows = affectedRowsArr.reduce((prev, cur) => prev + cur)
+        console.info(`ADDED resolution: ${data.title} (${affectedRows} votes)`)
     }
 
     async insertVote(client, id, voteStr) {
