@@ -27,6 +27,6 @@ const Resolver = require('./resolution-resolver')
     await Promise.all(promises)
 
     await pool.end();
-    console.info('QUIT: all resolutions parsed')
+    console.info('QUIT all resolutions parsed')
     process.exit(0)
 })().catch(e => console.error(e))

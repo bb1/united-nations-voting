@@ -73,7 +73,7 @@ class ResolutionResolver {
                 `INSERT INTO un.agenda(title)
                 VALUES($1) RETURNING id`,
                 [data.agenda])
-            agenda_id = res1.rows.id;
+            agenda_id = res1.rows[0].id;
             console.info(`ADDED agenda: ${data.agenda}`)
         }
         const res2 = await client.query(
@@ -90,14 +90,17 @@ class ResolutionResolver {
     }
 
     async insertVote(client, id, voteStr) {
-        if (!voteStr || voteStr.length < 3 || voteStr.charAt(1) !== ' ') {
+        if (!voteStr) {
             return 0
         }
-        const vote = voteStr.split(' ')[0]
-        const country = voteStr.substr(2)
-        const absent = vote === 'A'
-        const approval = vote === 'Y'
-        const disaproval = vote === 'N'
+        const voteArr = voteStr.split(' ')
+        // if the vote doesn't start with Y/N/A it's a non vote
+        const nonVoted = voteArr[0].length > 1
+        const country = nonVoted ? voteStr : voteStr.substr(2)
+        const vote = voteArr[0]
+        const absent = nonVoted ? false : vote === 'A'
+        const approval = nonVoted ? false : vote === 'Y'
+        const disaproval = nonVoted ? false : vote === 'N'
         const res = await client.query(
             `INSERT INTO un.vote (resolution_id, country, yes, no, absent)
             VALUES ($1, $2, $3, $4, $5) `,
