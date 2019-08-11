@@ -7,8 +7,8 @@ WITH votes AS (
 	WHERE yes OR no
 )
 SELECT 
-	c1,
-	c2,
+	c1 as country1,
+	c2 as country2,
 	sum(alliance) as alliance
 FROM
 (SELECT

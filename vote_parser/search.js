@@ -1,0 +1,3 @@
+const searchUrl = "https://digitallibrary.un.org/search?ln=en&cc=Voting+Data&rg=1000&c=Voting+Data&c=&fct__2=General+Assembly&fct__9=Vote&fti=0&fct__3=2017"
+// https://digitallibrary.un.org/search?ln=en&cc=Voting+Data&p=&f=&rm=&ln=en&sf=latest+first&so=a&rg=200&c=Voting+Data&c=&of=hb&fti=0&fct__2=General+Assembly&fct__9=Vote&fct__3=2017&fti=0&fct__2=General+Assembly&fct__9=Vote&fct__3=2017
+// &sf=latest+first&so=a <-- nach Zeit aufsteigend
