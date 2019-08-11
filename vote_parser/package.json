@@ -1,11 +1,14 @@
 {
   "name": "united-nations-voting",
-  "description": "https://github.com/bb1/united-nations-voting/",
+  "description": "node.js based datamining tool to analyze global alliances using the UN voting data",
   "version": "1.0.0",
   "main": "index.js",
   "author": "https://github.com/bb1",
   "license": "MIT",
   "private": true,
+  "repository": {
+    "url": "https://github.com/bb1/united-nations-voting.git"
+  },
   "scripts": {
     "start": "node index.js"
   },

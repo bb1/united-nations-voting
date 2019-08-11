@@ -18,7 +18,10 @@ const Resolver = require('./resolution-resolver')
     })
 
     // TODO: get more urls
-    const urls = ['https://digitallibrary.un.org/record/3814149?ln=en']
+    const urls = [
+        'https://digitallibrary.un.org/record/3814149?ln=en',
+        'https://digitallibrary.un.org/record/562433?ln=en'
+    ]
     const promises = urls.map(url => {
         const res = new Resolver(pool, url)
         return res.start()

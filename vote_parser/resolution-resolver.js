@@ -20,7 +20,9 @@ class ResolutionResolver {
 
     async grabData(url) {
         const checkUrl = /.+digitallibrary\.un\.org\/record\/(\d+)(\?.+)?/.test(this.url)
-        if (!checkUrl) throw 'invalid url'
+        if (!checkUrl) {
+            throw new Error('invalid url')
+        }
         
         const id = RegExp.$1
         const $ = await rq({
