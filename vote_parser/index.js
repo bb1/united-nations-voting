@@ -20,10 +20,13 @@ const Search = require('./search')
 
     // TODO: get more urls
     const search = new Search()
-    const urls = await search.start(2017)
+    const urls = await search.start(1977)
+    let leftUrls = urls.length
     const promises = urls.map(url => {
         const res = new Resolver(pool, url)
-        return res.start()
+        return res.start().then(() => {
+            console.info(`urls left: ${--leftUrls}`)
+        })
     })
 
     await Promise.all(promises)
