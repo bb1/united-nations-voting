@@ -18,9 +18,17 @@ const Search = require('./search')
         process.exit(-1)
     })
 
-    // TODO: get more urls
+    const year = process.argv[2]
+    if (year && year.length === 4) {
+        console.info(`Parsing year ${year}...`)
+    } else {
+        console.error(`Invalid year argument. Use: node index.js 2001.`)
+        await pool.end();
+        process.exit(1)
+    }
+
     const search = new Search()
-    const urls = await search.start(1977)
+    const urls = await search.start(year)
     let leftUrls = urls.length
     const promises = urls.map(url => {
         const res = new Resolver(pool, url)
