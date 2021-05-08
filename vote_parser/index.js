@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Pool } = require('pg')
 const Resolver = require('./resolution-resolver')
 const Search = require('./search')
@@ -6,11 +7,11 @@ const Search = require('./search')
 ;(async () => {
     // db init
     const pool = await Pool({
-        user: 'postgres',
-        host: '127.0.0.1',
-        database: 'un',
-        password: 'root',
-        port: 5432,
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE,
     })
     
     pool.on('error', (err, client) => {
